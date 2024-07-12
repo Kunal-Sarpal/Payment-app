@@ -1,13 +1,12 @@
+// middleware/auth.js (your auth middleware file)
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = require("./config");
-
+const JWT_SECRET = require("./config"); // Adjust the path as necessary
 
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
-
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(403).json({ message });
+        return res.status(403).json({ message: "Authorization header missing or malformed" });
     }
 
     const token = authHeader.split(' ')[1];
@@ -18,15 +17,12 @@ const authMiddleware = (req, res, next) => {
         if (decodedToken.userId) {
             req.userId = decodedToken.userId;
             next();
+        } else {
+            return res.status(403).json({ message: "Invalid token: userId missing" });
         }
-        else {
-            return res.status(403).json({});
-
-        }
+    } catch (err) {
+        return res.status(403).json({ message: "Invalid token" });
     }
-    catch (err) {
-        return res.status(403).json({});
-    }
-
 };
-module.exports = authMiddleware
+
+module.exports = authMiddleware;
